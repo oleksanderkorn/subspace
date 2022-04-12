@@ -1,10 +1,10 @@
 use log::info;
-use parachain_template_node::{
+use cirrus_node::{
 	chain_spec,
 	cli::{Cli, RelayChainCli, Subcommand},
 	service::{self, new_partial, start_parachain_node, TemplateRuntimeExecutor},
 };
-use parachain_template_runtime::{Block, RuntimeApi};
+use cirrus_runtime::{Block, RuntimeApi};
 use sc_cli::{Result, SubstrateCli};
 
 macro_rules! construct_async_run {

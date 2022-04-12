@@ -1,5 +1,5 @@
 [package]
-name = "parachain-template-runtime"
+name = "cirrus-runtime"
 version = "0.1.0"
 authors = ["Anonymous"]
 description = "A new Cumulus FRAME-based Substrate Runtime, ready for hacking together a parachain."
@@ -48,8 +48,8 @@ pallet-balances = { default-features = false, git = "https://github.com/parityte
 pallet-transaction-payment = { default-features = false, git = "https://github.com/paritytech/substrate", rev = "c364008a6c7da8456e17967f55edf51e45146998" }
 pallet-transaction-payment-rpc-runtime-api = { default-features = false, git = "https://github.com/paritytech/substrate", rev = "c364008a6c7da8456e17967f55edf51e45146998" }
 
-cirrus-pallet-executive = { path = "../../pallets/executive", default-features = false }
-cirrus-primitives = { path = "../../primitives", default-features = false }
+cirrus-pallet-executive = { path = "../pallets/executive", default-features = false }
+cirrus-primitives = { path = "../primitives", default-features = false }
 
 [features]
 default = [
