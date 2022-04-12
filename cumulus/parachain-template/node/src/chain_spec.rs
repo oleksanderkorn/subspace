@@ -22,8 +22,6 @@ pub fn get_pair_from_seed<TPublic: Public>(seed: &str) -> <TPublic::Pair as Pair
 pub struct Extensions {
 	/// The relay chain of the Parachain.
 	pub relay_chain: String,
-	/// The id of the Parachain.
-	pub para_id: u32,
 }
 
 impl Extensions {
@@ -79,7 +77,6 @@ pub fn development_config() -> ChainSpec {
 		None,
 		Extensions {
 			relay_chain: "rococo-local".into(), // You MUST set this to the correct network!
-			para_id: 1000,
 		},
 	)
 }
@@ -125,7 +122,6 @@ pub fn local_testnet_config() -> ChainSpec {
 		// Extensions
 		Extensions {
 			relay_chain: "rococo-local".into(), // You MUST set this to the correct network!
-			para_id: 1000,
 		},
 	)
 }
