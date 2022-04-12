@@ -1,20 +1,11 @@
-use crate::{
+use log::info;
+use parachain_template_node::{
 	chain_spec,
 	cli::{Cli, RelayChainCli, Subcommand},
-	service::{new_partial, TemplateRuntimeExecutor},
+	service::{self, new_partial, start_parachain_node, TemplateRuntimeExecutor},
 };
-use log::info;
 use parachain_template_runtime::{Block, RuntimeApi};
 use sc_cli::{Result, SubstrateCli};
-
-pub(crate) fn load_spec(id: &str) -> std::result::Result<Box<dyn sc_service::ChainSpec>, String> {
-	Ok(match id {
-		"dev" => Box::new(chain_spec::development_config()),
-		"template-rococo" => Box::new(chain_spec::local_testnet_config()),
-		"" | "local" => Box::new(chain_spec::local_testnet_config()),
-		path => Box::new(chain_spec::ChainSpec::from_json_file(std::path::PathBuf::from(path))?),
-	})
-}
 
 macro_rules! construct_async_run {
 	(|$components:ident, $cli:ident, $cmd:ident, $config:ident| $( $code:tt )* ) => {{
@@ -26,7 +17,7 @@ macro_rules! construct_async_run {
 				_
 			>(
 				&$config,
-				crate::service::parachain_build_import_queue,
+				service::parachain_build_import_queue,
 			)?;
 			let task_manager = $components.task_manager;
 			{ $( $code )* }.map(|v| (v, task_manager))
@@ -35,7 +26,7 @@ macro_rules! construct_async_run {
 }
 
 /// Parse command line arguments into service configuration.
-pub fn run() -> Result<()> {
+pub fn main() -> Result<()> {
 	let cli = Cli::from_args();
 
 	match &cli.subcommand {
@@ -113,7 +104,7 @@ pub fn run() -> Result<()> {
 
 				info!("Is collating: {}", if config.role.is_authority() { "yes" } else { "no" });
 
-				crate::service::start_parachain_node(config, polkadot_config)
+				start_parachain_node(config, polkadot_config)
 					.await
 					.map(|r| r.0)
 					.map_err(Into::into)
