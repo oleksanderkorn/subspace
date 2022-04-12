@@ -1,7 +1,7 @@
 use cirrus_node::{
 	chain_spec,
 	cli::{Cli, RelayChainCli, Subcommand},
-	service::{self, new_partial, start_parachain_node, TemplateRuntimeExecutor},
+	service::{self, new_partial, start_parachain_node, CirrusRuntimeExecutor},
 };
 use cirrus_runtime::{Block, RuntimeApi};
 use log::info;
@@ -13,7 +13,7 @@ macro_rules! construct_async_run {
 		runner.async_run(|$config| {
 			let $components = new_partial::<
 				RuntimeApi,
-				TemplateRuntimeExecutor,
+				CirrusRuntimeExecutor,
 				_
 			>(
 				&$config,
@@ -82,7 +82,7 @@ pub fn main() -> Result<()> {
 			if cfg!(feature = "runtime-benchmarks") {
 				let runner = cli.create_runner(cmd)?;
 
-				runner.sync_run(|config| cmd.run::<Block, TemplateRuntimeExecutor>(config))
+				runner.sync_run(|config| cmd.run::<Block, CirrusRuntimeExecutor>(config))
 			} else {
 				Err("Benchmarking wasn't enabled when building the node. \
 				You can enable it with `--features runtime-benchmarks`."
