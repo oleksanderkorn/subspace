@@ -1,10 +1,10 @@
-use log::info;
 use cirrus_node::{
 	chain_spec,
 	cli::{Cli, RelayChainCli, Subcommand},
 	service::{self, new_partial, start_parachain_node, TemplateRuntimeExecutor},
 };
 use cirrus_runtime::{Block, RuntimeApi};
+use log::info;
 use sc_cli::{Result, SubstrateCli};
 
 macro_rules! construct_async_run {
@@ -104,7 +104,23 @@ pub fn main() -> Result<()> {
 
 				info!("Is collating: {}", if config.role.is_authority() { "yes" } else { "no" });
 
-				start_parachain_node(config, polkadot_config)
+				let primary_chain_full_node = {
+					let span = sc_tracing::tracing::info_span!(
+						sc_tracing::logging::PREFIX_LOG_SPAN,
+						name = "Primarychain"
+					);
+					let _enter = span.enter();
+
+					subspace_service::new_full::<
+						subspace_runtime::RuntimeApi,
+						subspace_node::ExecutorDispatch,
+					>(polkadot_config, false)
+					.map_err(|_| {
+						sc_service::Error::Other("Failed to build a full subspace node".into())
+					})?
+				};
+
+				start_parachain_node(config, primary_chain_full_node)
 					.await
 					.map(|r| r.0)
 					.map_err(Into::into)
