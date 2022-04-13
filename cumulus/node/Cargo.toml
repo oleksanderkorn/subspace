@@ -12,15 +12,6 @@ build = "build.rs"
 [package.metadata.docs.rs]
 targets = ["x86_64-unknown-linux-gnu"]
 
-[build-dependencies]
-substrate-build-script-utils = { git = "https://github.com/paritytech/substrate", rev = "c364008a6c7da8456e17967f55edf51e45146998" }
-
-[features]
-runtime-benchmarks = [
-    "cirrus-runtime/runtime-benchmarks",
-    "subspace-node/runtime-benchmarks",
-]
-
 [dependencies]
 futures = "0.3.21"
 hex-literal = "0.3.1"
@@ -79,7 +70,14 @@ cirrus-client-service = { path = "../client/cirrus-service" }
 cirrus-primitives = { path = "../primitives" }
 
 # Subspace dependencies
-subspace-node = { path = "../../crates/subspace-node" }
 subspace-runtime = { path = "../../crates/subspace-runtime" }
 subspace-service = { path = "../../crates/subspace-service" }
 subspace-runtime-primitives = { path = "../../crates/subspace-runtime-primitives" }
+
+[build-dependencies]
+substrate-build-script-utils = { git = "https://github.com/paritytech/substrate", rev = "c364008a6c7da8456e17967f55edf51e45146998" }
+
+[features]
+runtime-benchmarks = [
+    "cirrus-runtime/runtime-benchmarks",
+]
