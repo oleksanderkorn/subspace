@@ -29,7 +29,7 @@ impl SecondaryChainCli {
     ) -> Self {
         // let extension = chain_spec::Extensions::try_get(&*primary_config.chain_spec);
         // let chain_id = extension.map(|e| e.relay_chain.clone());
-        let chain_id = Some("dev".into());
+        let chain_id = Some("rococo".into());
         let base_path = primary_base_path.map(|x| x.path().join("executor"));
         // TODO: we might want to forcibly inject the `--validator` flag.
         Self {
@@ -117,6 +117,7 @@ impl CliConfiguration<Self> for SecondaryChainCli {
     }
 
     fn base_path(&self) -> Result<Option<BasePath>> {
+        println!("============================ SecondaryChainCli: shared_params.base_path(): {:?}", self.shared_params().base_path());
         Ok(self
             .shared_params()
             .base_path()
