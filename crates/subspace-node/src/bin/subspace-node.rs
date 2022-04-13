@@ -19,7 +19,7 @@
 use futures::future::TryFutureExt;
 use sc_cli::{ChainSpec, SubstrateCli};
 use sp_core::crypto::Ss58AddressFormat;
-use subspace_node::{Cli, ExecutorDispatch, Subcommand};
+use subspace_node::{Cli, ExecutorDispatch, SecondaryChainCli, Subcommand};
 use subspace_runtime::RuntimeApi;
 
 /// Subspace node error.
@@ -70,6 +70,44 @@ fn set_default_ss58_version<C: AsRef<dyn ChainSpec>>(chain_spec: C) {
 
 fn main() -> std::result::Result<(), Error> {
     let cli = Cli::from_args();
+
+    if !cli.secondarychain_args.is_empty() {
+        // TODO: executor_cli.run_node_until_exit()
+        let runner = cli.create_runner(&cli.run.base)?;
+        set_default_ss58_version(&runner.config().chain_spec);
+        runner.run_node_until_exit(|config| async move {
+            let secondary_chain_cli =
+                SecondaryChainCli::new(config.base_path.as_ref(), cli.secondarychain_args.iter());
+
+            let executor_config = SubstrateCli::create_configuration(
+                &secondary_chain_cli,
+                &secondary_chain_cli,
+                config.tokio_handle.clone(),
+            )
+            .map_err(|err| format!("Secondary chain argument error: {}", err))?;
+
+            let primary_chain_full_node = {
+                let span = sc_tracing::tracing::info_span!(
+                    sc_tracing::logging::PREFIX_LOG_SPAN,
+                    name = "Primarychain"
+                );
+                let _enter = span.enter();
+
+                subspace_service::new_full::<subspace_runtime::RuntimeApi, ExecutorDispatch>(
+                    config, false,
+                )
+                .map_err(|_| {
+                    sc_service::Error::Other("Failed to build a full subspace node".into())
+                })?
+            };
+
+            cirrus_node::service::start_parachain_node(executor_config, primary_chain_full_node)
+                .await
+                .map(|r| r.0)
+        })?;
+
+        return Ok(());
+    }
 
     match &cli.subcommand {
         Some(Subcommand::Key(cmd)) => cmd.run(&cli)?,
@@ -191,6 +229,9 @@ fn main() -> std::result::Result<(), Error> {
                         .into(),
                 ));
             }
+        }
+        Some(Subcommand::Executor(cmd)) => {
+            unimplemented!("Impl executor subcommand: {:?}", cmd);
         }
         None => {
             let runner = cli.create_runner(&cli.run.base)?;

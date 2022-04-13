@@ -18,8 +18,10 @@
 
 mod chain_spec;
 mod import_blocks_from_dsn;
+mod secondary_chain_cli;
 
 pub use crate::import_blocks_from_dsn::ImportBlocksFromDsnCmd;
+pub use crate::secondary_chain_cli::SecondaryChainCli;
 use clap::Parser;
 use sc_cli::SubstrateCli;
 use sc_executor::{NativeExecutionDispatch, RuntimeVersion};
@@ -79,6 +81,10 @@ pub enum Subcommand {
     /// Revert the chain to a previous state.
     Revert(sc_cli::RevertCmd),
 
+    /// Run an executor.
+    #[clap(subcommand)]
+    Executor(cirrus_node::cli::Subcommand),
+
     /// The custom benchmark subcommand benchmarking runtime pallets.
     #[clap(name = "benchmark", about = "Benchmark runtime pallets.")]
     Benchmark(frame_benchmarking_cli::BenchmarkCmd),
@@ -94,6 +100,11 @@ pub struct RunCmd {
 
 /// Subspace Cli.
 #[derive(Debug, Parser)]
+#[clap(
+    propagate_version = true,
+    args_conflicts_with_subcommands = true,
+    subcommand_negates_reqs = true
+)]
 pub struct Cli {
     /// Various utility commands.
     #[clap(subcommand)]
@@ -102,6 +113,10 @@ pub struct Cli {
     /// Run a node.
     #[clap(flatten)]
     pub run: RunCmd,
+
+    /// Secondarychain arguments
+    #[clap(raw = true)]
+    pub secondarychain_args: Vec<String>,
 }
 
 impl SubstrateCli for Cli {

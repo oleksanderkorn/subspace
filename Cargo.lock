@@ -8518,18 +8518,22 @@ dependencies = [
 name = "subspace-node"
 version = "0.1.0"
 dependencies = [
+ "cirrus-node",
  "clap 3.1.6",
+ "cumulus-client-cli",
  "frame-benchmarking-cli",
  "frame-support",
  "futures 0.3.21",
  "log",
  "parity-scale-codec",
+ "sc-chain-spec",
  "sc-cli",
  "sc-client-api",
  "sc-consensus",
  "sc-executor",
  "sc-service",
  "sc-telemetry",
+ "sc-tracing",
  "serde",
  "sp-consensus",
  "sp-core",

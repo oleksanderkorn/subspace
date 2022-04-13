@@ -49,10 +49,6 @@ pub struct Cli {
 
 	#[clap(flatten)]
 	pub run: cumulus_client_cli::RunCmd,
-
-	/// Relaychain arguments
-	#[clap(raw = true)]
-	pub relaychain_args: Vec<String>,
 }
 
 impl SubstrateCli for Cli {
